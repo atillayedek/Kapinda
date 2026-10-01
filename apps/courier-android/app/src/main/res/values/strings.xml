@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Kapında Kurye</string>
+    <string name="channel_orders">Görev bildirimleri</string>
+    <string name="channel_tracking">Teslimat konum paylaşımı</string>
+    <string name="tracking_title">Teslimat sürüyor</string>
+    <string name="tracking_text">Aktif teslimat boyunca konumunuz müşteriyle paylaşılıyor.</string>
+</resources>

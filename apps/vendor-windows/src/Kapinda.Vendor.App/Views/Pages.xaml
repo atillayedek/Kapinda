@@ -1,0 +1,483 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:vm="clr-namespace:Kapinda.Vendor.App.ViewModels">
+
+    <DataTemplate DataType="{x:Type vm:LoginViewModel}">
+        <Grid Background="{StaticResource CreamBrush}">
+            <Border Style="{StaticResource Card}" Width="420" VerticalAlignment="Center" Padding="28">
+                <StackPanel>
+                    <TextBlock Text="Kapında İşletme" Style="{StaticResource H1}" Foreground="{StaticResource GreenBrush}" />
+                    <TextBlock Text="Onaylı işletme hesabınızla giriş yapın." Style="{StaticResource Muted}" Margin="0,0,0,16" />
+                    <TextBlock Text="E-posta" />
+                    <TextBox Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,12" />
+                    <TextBlock Text="Şifre" />
+                    <PasswordBox x:Name="Pwd" Margin="0,4,0,12" />
+                    <TextBlock Text="{Binding Error}" Style="{StaticResource ErrorText}" Visibility="{Binding Error, Converter={StaticResource NullVis}}" />
+                <TextBlock Text="{Binding Info}" Style="{StaticResource InfoText}" Visibility="{Binding Info, Converter={StaticResource NullVis}}" />
+                <ProgressBar IsIndeterminate="True" Height="3" Visibility="{Binding IsBusy, Converter={StaticResource BoolVis}}" Margin="0,0,0,8" />
+                    <Button Content="Giriş yap" IsDefault="True" Command="{Binding LoginCommand}" CommandParameter="{Binding ElementName=Pwd}" HorizontalAlignment="Stretch" Margin="0" />
+                    <TextBlock Text="Başvuru ve şifre işlemleri: kapinda.site" Style="{StaticResource Muted}" Margin="0,12,0,0" />
+                </StackPanel>
+            </Border>
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:PendingViewModel}">
+        <Border Style="{StaticResource Card}" Width="520" VerticalAlignment="Center" Padding="28">
+            <StackPanel>
+                <TextBlock Text="{Binding Heading}" Style="{StaticResource H1}" />
+                <TextBlock Text="{Binding Body}" TextWrapping="Wrap" Margin="0,0,0,16" />
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="Durumu yenile" Command="{Binding RefreshCommand}" />
+                    <Button Content="Çıkış yap" Style="{StaticResource SecondaryButton}" Command="{Binding SignOutCommand}" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:MessageViewModel}">
+        <Border Style="{StaticResource Card}" Width="520" VerticalAlignment="Center" Padding="28">
+            <StackPanel>
+                <TextBlock Text="{Binding Title}" Style="{StaticResource H1}" />
+                <TextBlock Text="{Binding Body}" TextWrapping="Wrap" Margin="0,0,0,16" />
+                <Button Content="{Binding ActionLabel}" Command="{Binding ActionCommand}" Visibility="{Binding ActionLabel, Converter={StaticResource NullVis}}" HorizontalAlignment="Left" />
+            </StackPanel>
+        </Border>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="28">
+                <TextBlock Text="{Binding Title}" Style="{StaticResource H1}" />
+                <TextBlock Text="{Binding Error}" Style="{StaticResource ErrorText}" Visibility="{Binding Error, Converter={StaticResource NullVis}}" />
+                <TextBlock Text="{Binding Info}" Style="{StaticResource InfoText}" Visibility="{Binding Info, Converter={StaticResource NullVis}}" />
+                <ProgressBar IsIndeterminate="True" Height="3" Visibility="{Binding IsBusy, Converter={StaticResource BoolVis}}" Margin="0,0,0,8" />
+                <TextBlock Text="{Binding VendorName}" Style="{StaticResource H2}" Margin="0,0,0,12" />
+                <UniformGrid Columns="4" Margin="0,0,0,12">
+                    <Border Style="{StaticResource Card}" Margin="0,0,8,0"><StackPanel><TextBlock Text="Onay bekleyen" Style="{StaticResource Muted}" /><TextBlock Text="{Binding PendingCount}" FontSize="28" FontWeight="Bold" /></StackPanel></Border>
+                    <Border Style="{StaticResource Card}" Margin="0,0,8,0"><StackPanel><TextBlock Text="Hazırlanıyor" Style="{StaticResource Muted}" /><TextBlock Text="{Binding PreparingCount}" FontSize="28" FontWeight="Bold" /></StackPanel></Border>
+                    <Border Style="{StaticResource Card}" Margin="0,0,8,0"><StackPanel><TextBlock Text="Hazır / kurye" Style="{StaticResource Muted}" /><TextBlock Text="{Binding ReadyCount}" FontSize="28" FontWeight="Bold" /></StackPanel></Border>
+                    <Border Style="{StaticResource Card}"><StackPanel><TextBlock Text="Bugün teslim" Style="{StaticResource Muted}" /><TextBlock Text="{Binding Today.DeliveredOrders}" FontSize="28" FontWeight="Bold" /></StackPanel></Border>
+                </UniformGrid>
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Text="Bugün" Style="{StaticResource H2}" />
+                        <TextBlock><Run Text="Ürün satışı (kapıda tahsil): " /><Run Text="{Binding Today.ProductGmv, Converter={StaticResource Try}, Mode=OneWay}" FontWeight="Bold" /></TextBlock>
+                        <TextBlock><Run Text="Platform komisyonu: " /><Run Text="{Binding Today.CommissionTotal, Converter={StaticResource Try}, Mode=OneWay}" FontWeight="Bold" /></TextBlock>
+                    </StackPanel>
+                </Border>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                    <TextBlock Text="Sipariş alımı: " VerticalAlignment="Center" />
+                    <TextBlock Text="AÇIK" Foreground="{StaticResource GreenBrush}" FontWeight="Bold" VerticalAlignment="Center" Visibility="{Binding IsOpen, Converter={StaticResource BoolVis}}" Margin="0,0,12,0" />
+                    <TextBlock Text="KAPALI" Foreground="{StaticResource DangerBrush}" FontWeight="Bold" VerticalAlignment="Center" Visibility="{Binding IsOpen, Converter={StaticResource InvBoolVis}}" Margin="0,0,12,0" />
+                    <Button Content="Aç / Kapat" Style="{StaticResource SecondaryButton}" Command="{Binding ToggleOpenCommand}" />
+                </StackPanel>
+                <TextBlock Text="Son siparişler" Style="{StaticResource H2}" Margin="0,0,0,8" />
+                <DataGrid ItemsSource="{Binding Recent}" MinHeight="200">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Sipariş" Binding="{Binding OrderNumber}" Width="160" />
+                        <DataGridTextColumn Header="Durum" Binding="{Binding Status, Converter={StaticResource StatusLabel}}" Width="170" />
+                        <DataGridTextColumn Header="Müşteri" Binding="{Binding CustomerName}" Width="*" />
+                        <DataGridTextColumn Header="Tutar" Binding="{Binding ProductSubtotal, Converter={StaticResource Try}}" Width="120" />
+                        <DataGridTemplateColumn Width="90"><DataGridTemplateColumn.CellTemplate><DataTemplate><Button Content="Aç" Padding="10,2" Command="{Binding DataContext.OpenCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" /></DataTemplate></DataGridTemplateColumn.CellTemplate></DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
+        </ScrollViewer>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:OrdersViewModel}">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="28">
+                <TextBlock Text="{Binding Title}" Style="{StaticResource H1}" />
+                <TextBlock Text="{Binding Error}" Style="{StaticResource ErrorText}" Visibility="{Binding Error, Converter={StaticResource NullVis}}" />
+                <TextBlock Text="{Binding Info}" Style="{StaticResource InfoText}" Visibility="{Binding Info, Converter={StaticResource NullVis}}" />
+                <ProgressBar IsIndeterminate="True" Height="3" Visibility="{Binding IsBusy, Converter={StaticResource BoolVis}}" Margin="0,0,0,8" />
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                    <Button Content="Yenile" Style="{StaticResource SecondaryButton}" Command="{Binding RefreshCommand}" />
+                    <Button Content="Önceki" Style="{StaticResource SecondaryButton}" Command="{Binding PrevCommand}" />
+                    <Button Content="Sonraki" Style="{StaticResource SecondaryButton}" Command="{Binding NextCommand}" IsEnabled="{Binding HasMore}" />
+                </StackPanel>
+                <TextBlock Text="Henüz sipariş bulunmuyor." Style="{StaticResource Muted}" Visibility="{Binding IsEmpty, Converter={StaticResource BoolVis}}" />
+                <DataGrid ItemsSource="{Binding Items}" MinHeight="300" x:Name="Grid">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Sipariş" Binding="{Binding OrderNumber}" Width="160" />
+                        <DataGridTextColumn Header="Durum" Binding="{Binding Status, Converter={StaticResource StatusLabel}}" Width="170" />
+                        <DataGridTextColumn Header="Müşteri" Binding="{Binding CustomerName}" Width="*" />
+                        <DataGridTextColumn Header="Ürün" Binding="{Binding ItemCount}" Width="60" />
+                        <DataGridTextColumn Header="Kapıda tahsil" Binding="{Binding ProductSubtotal, Converter={StaticResource Try}}" Width="120" />
+                        <DataGridTextColumn Header="Tarih" Binding="{Binding CreatedAt, StringFormat=g}" Width="140" />
+                        <DataGridTemplateColumn Width="90">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate><Button Content="Aç" Padding="10,2" Command="{Binding DataContext.OpenCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" /></DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
+        </ScrollViewer>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:OrderDetailViewModel}">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="28">
+                <TextBlock Text="{Binding Title}" Style="{StaticResource H1}" />
+                <TextBlock Text="{Binding Error}" Style="{StaticResource ErrorText}" Visibility="{Binding Error, Converter={StaticResource NullVis}}" />
+                <TextBlock Text="{Binding Info}" Style="{StaticResource InfoText}" Visibility="{Binding Info, Converter={StaticResource NullVis}}" />
+                <ProgressBar IsIndeterminate="True" Height="3" Visibility="{Binding IsBusy, Converter={StaticResource BoolVis}}" Margin="0,0,0,8" />
+                <Button Content="← Siparişler" Style="{StaticResource SecondaryButton}" Command="{Binding BackCommand}" HorizontalAlignment="Left" Margin="0,0,0,12" />
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Text="{Binding Order.OrderNumber}" Style="{StaticResource H2}" />
+                        <TextBlock Text="{Binding StatusLabel}" Foreground="{StaticResource GreenBrush}" FontWeight="Bold" Margin="0,4" />
+                        <TextBlock><Run Text="Müşteri: " /><Run Text="{Binding Order.CustomerName, Mode=OneWay}" /><Run Text="  " /><Run Text="{Binding Order.CustomerPhone, Converter={StaticResource Phone}, Mode=OneWay}" /></TextBlock>
+                        <TextBlock Text="{Binding Order.AddressLine}" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding Order.Directions}" Style="{StaticResource Muted}" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding Order.CustomerNote, StringFormat=Not: {0}}" Visibility="{Binding Order.CustomerNote, Converter={StaticResource NullVis}}" TextWrapping="Wrap" />
+                        <TextBlock Margin="0,8,0,0"><Run Text="Kapıda tahsil edilecek ürün bedeli: " /><Run Text="{Binding Order.ProductSubtotal, Converter={StaticResource Try}, Mode=OneWay}" FontWeight="Bold" /><Run Text=" (" /><Run Text="{Binding PaymentLabel, Mode=OneWay}" /><Run Text=")" /></TextBlock>
+                        <TextBlock Text="Teslimat ücreti ve komisyon sunucu tarafından belirlenir; bu ekrandan değiştirilemez." Style="{StaticResource Muted}" />
+                    </StackPanel>
+                </Border>
+                <WrapPanel Margin="0,0,0,12">
+                    <Button Content="Kabul et" Command="{Binding AcceptCommand}" Visibility="{Binding CanAccept, Converter={StaticResource BoolVis}}" />
+                    <Button Content="Hazırlanıyor" Command="{Binding PrepareCommand}" Visibility="{Binding CanPrepare, Converter={StaticResource BoolVis}}" />
+                    <Button Content="Hazır" Style="{StaticResource AccentButton}" Command="{Binding ReadyCommand}" Visibility="{Binding CanReady, Converter={StaticResource BoolVis}}" />
+                    <Button Content="Reddet" Style="{StaticResource DangerButton}" Command="{Binding RejectCommand}" Visibility="{Binding CanAccept, Converter={StaticResource BoolVis}}" />
+                    <Button Content="İptal et" Style="{StaticResource DangerButton}" Command="{Binding RejectCommand}" Visibility="{Binding CanCancel, Converter={StaticResource BoolVis}}" />
+                </WrapPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8" Visibility="{Binding CanEditItems, Converter={StaticResource BoolVis}}">
+                    <TextBlock Text="Alternatif ürün (gerekirse): " VerticalAlignment="Center" />
+                    <ComboBox ItemsSource="{Binding Alternatives}" SelectedItem="{Binding SelectedAlternative}" DisplayMemberPath="Name" Width="320" />
+                </StackPanel>
+                <DataGrid ItemsSource="{Binding Items}" MinHeight="200">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Adet" Binding="{Binding Quantity}" Width="60" />
+                        <DataGridTextColumn Header="Ürün" Binding="{Binding ProductName}" Width="*" />
+                        <DataGridTextColumn Header="Barkod" Binding="{Binding Barcode}" Width="130" />
+                        <DataGridTextColumn Header="Tutar" Binding="{Binding LineTotal, Converter={StaticResource Try}}" Width="110" />
+                        <DataGridTextColumn Header="Stokta yoksa" Binding="{Binding SubstitutionPreference, Converter={StaticResource StatusLabel}, ConverterParameter=substitution}" Width="170" />
+                        <DataGridTextColumn Header="Durum" Binding="{Binding Fulfillment, Converter={StaticResource StatusLabel}, ConverterParameter=fulfillment}" Width="150" />
+                        <DataGridTemplateColumn Width="120"><DataGridTemplateColumn.CellTemplate><DataTemplate><Button Content="Stokta yok" Padding="8,2" Style="{StaticResource SecondaryButton}" Command="{Binding DataContext.MarkUnavailableCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" /></DataTemplate></DataGridTemplateColumn.CellTemplate></DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
+        </ScrollViewer>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:ProductsViewModel}">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="28">
+                <TextBlock Text="{Binding Title}" Style="{StaticResource H1}" />
+                <TextBlock Text="{Binding Error}" Style="{StaticResource ErrorText}" Visibility="{Binding Error, Converter={StaticResource NullVis}}" />
+                <TextBlock Text="{Binding Info}" Style="{StaticResource InfoText}" Visibility="{Binding Info, Converter={StaticResource NullVis}}" />
+                <ProgressBar IsIndeterminate="True" Height="3" Visibility="{Binding IsBusy, Converter={StaticResource BoolVis}}" Margin="0,0,0,8" />
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                    <TextBox Width="280" Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,8,0" />
+                    <Button Content="Ara" Style="{StaticResource SecondaryButton}" Command="{Binding SearchNowCommand}" IsDefault="True" />
+                    <Button Content="+ Ürün Ekle" Command="{Binding AddCommand}" />
+                </StackPanel>
+                <DataGrid ItemsSource="{Binding Items}" MinHeight="400">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Ürün" Binding="{Binding Name}" Width="*" />
+                        <DataGridTextColumn Header="Barkod" Binding="{Binding Barcode}" Width="130" />
+                        <DataGridTextColumn Header="Fiyat" Binding="{Binding Price, Converter={StaticResource Try}}" Width="110" />
+                        <DataGridTextColumn Header="Stok" Binding="{Binding StockQuantity}" Width="70" />
+                        <DataGridCheckBoxColumn Header="Satışta" Binding="{Binding IsActive}" Width="70" />
+                        <DataGridCheckBoxColumn Header="18+" Binding="{Binding IsAgeRestricted}" Width="50" />
+                        <DataGridTemplateColumn Width="170"><DataGridTemplateColumn.CellTemplate><DataTemplate><StackPanel Orientation="Horizontal">
+                            <Button Content="Düzenle" Padding="8,2" Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" />
+                            <Button Content="Sil" Padding="8,2" Style="{StaticResource DangerButton}" Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" />
+                        </StackPanel></DataTemplate></DataGridTemplateColumn.CellTemplate></DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
+        </ScrollViewer>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:ProductEditViewModel}">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="28">
+                <TextBlock Text="{Binding Title}" Style="{StaticResource H1}" />
+                <TextBlock Text="{Binding Error}" Style="{StaticResource ErrorText}" Visibility="{Binding Error, Converter={StaticResource NullVis}}" />
+                <TextBlock Text="{Binding Info}" Style="{StaticResource InfoText}" Visibility="{Binding Info, Converter={StaticResource NullVis}}" />
+                <ProgressBar IsIndeterminate="True" Height="3" Visibility="{Binding IsBusy, Converter={StaticResource BoolVis}}" Margin="0,0,0,8" />
+                <Button Content="← Ürünler" Style="{StaticResource SecondaryButton}" Command="{Binding BackCommand}" HorizontalAlignment="Left" Margin="0,0,0,12" />
+                <Border Style="{StaticResource Card}" MaxWidth="640" HorizontalAlignment="Left">
+                    <StackPanel>
+                        <TextBlock Text="Ürün adı" /><TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,10" />
+                        <TextBlock Text="Kategori" /><ComboBox ItemsSource="{Binding Categories}" SelectedItem="{Binding Category}" DisplayMemberPath="Name" Margin="0,4,0,10" />
+                        <TextBlock Text="Açıklama" /><TextBox Text="{Binding Description}" Height="70" TextWrapping="Wrap" AcceptsReturn="True" Margin="0,4,0,10" />
+                        <TextBlock Text="Barkod (EAN-13, isteğe bağlı — barkod okuyucuyla okutabilirsiniz)" /><TextBox Text="{Binding Barcode}" MaxLength="13" Margin="0,4,0,10" />
+                        <Grid Margin="0,0,0,10"><Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="12" /><ColumnDefinition /></Grid.ColumnDefinitions>
+                            <StackPanel><TextBlock Text="Fiyat (TL)" /><TextBox Text="{Binding Price}" Margin="0,4,0,0" /></StackPanel>
+                            <StackPanel Grid.Column="2"><TextBlock Text="Birim" /><ComboBox ItemsSource="{Binding Units}" SelectedItem="{Binding Unit}" Margin="0,4,0,0" /></StackPanel>
+                        </Grid>
+                        <CheckBox Content="Stok takibi" IsChecked="{Binding TrackStock}" Margin="0,0,0,6" />
+                        <TextBlock Text="Stok miktarı" Visibility="{Binding TrackStock, Converter={StaticResource BoolVis}}" />
+                        <TextBox Text="{Binding Stock}" Visibility="{Binding TrackStock, Converter={StaticResource BoolVis}}" Margin="0,4,0,10" />
+                        <CheckBox Content="Satışta" IsChecked="{Binding IsActive}" Margin="0,0,0,12" />
+                        <Image Source="{Binding ImageUrl}" Height="140" HorizontalAlignment="Left" Visibility="{Binding ImageUrl, Converter={StaticResource NullVis}}" Margin="0,0,0,8" />
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="Kaydet" Command="{Binding SaveCommand}" />
+                            <Button Content="Görsel ekle" Style="{StaticResource SecondaryButton}" Command="{Binding AddImageCommand}" />
+                        </StackPanel>
+                        <TextBlock Text="Yaş kısıtlı kategoriler ve mevzuat gereği online satışa kapalı ürünler listelenmez." Style="{StaticResource Muted}" Margin="0,10,0,0" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:BarcodeViewModel}">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="28">
+                <TextBlock Text="{Binding Title}" Style="{StaticResource H1}" />
+                <TextBlock Text="{Binding Error}" Style="{StaticResource ErrorText}" Visibility="{Binding Error, Converter={StaticResource NullVis}}" />
+                <TextBlock Text="{Binding Info}" Style="{StaticResource InfoText}" Visibility="{Binding Info, Converter={StaticResource NullVis}}" />
+                <ProgressBar IsIndeterminate="True" Height="3" Visibility="{Binding IsBusy, Converter={StaticResource BoolVis}}" Margin="0,0,0,8" />
+                <TextBlock Text="Barkod okuyucuyla ürünü okutun veya numarayı yazıp Enter'a basın." Margin="0,0,0,8" />
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                    <TextBox Width="260" FontSize="20" Text="{Binding Code, UpdateSourceTrigger=PropertyChanged}" MaxLength="13" />
+                    <Button Content="Ara" Command="{Binding LookupCommand}" IsDefault="True" Margin="8,0,0,0" />
+                </StackPanel>
+                <Border Style="{StaticResource Card}" Visibility="{Binding Found, Converter={StaticResource NullVis}}" MaxWidth="560" HorizontalAlignment="Left">
+                    <StackPanel>
+                        <TextBlock Text="{Binding Found.Name}" Style="{StaticResource H2}" />
+                        <TextBlock><Run Text="Fiyat: " /><Run Text="{Binding Found.Price, Converter={StaticResource Try}, Mode=OneWay}" /></TextBlock>
+                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                            <TextBlock Text="Stok: " VerticalAlignment="Center" /><TextBox Width="100" Text="{Binding NewStock}" Margin="4,0,8,0" />
+                            <Button Content="Stoğu kaydet" Command="{Binding SaveStockCommand}" />
+                            <Button Content="Düzenle" Style="{StaticResource SecondaryButton}" Command="{Binding EditCommand}" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+                <Button Content="Bu barkodla yeni ürün ekle" Style="{StaticResource SecondaryButton}" Command="{Binding CreateNewCommand}" HorizontalAlignment="Left" />
+            </StackPanel>
+        </ScrollViewer>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:StockViewModel}">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="28">
+                <TextBlock Text="{Binding Title}" Style="{StaticResource H1}" />
+                <TextBlock Text="{Binding Error}" Style="{StaticResource ErrorText}" Visibility="{Binding Error, Converter={StaticResource NullVis}}" />
+                <TextBlock Text="{Binding Info}" Style="{StaticResource InfoText}" Visibility="{Binding Info, Converter={StaticResource NullVis}}" />
+                <ProgressBar IsIndeterminate="True" Height="3" Visibility="{Binding IsBusy, Converter={StaticResource BoolVis}}" Margin="0,0,0,8" />
+                <CheckBox Content="Yalnız azalan stoklar (≤ 5)" IsChecked="{Binding OnlyLow}" Margin="0,0,0,12" />
+                <DataGrid ItemsSource="{Binding Items}" MinHeight="400" IsReadOnly="False">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Ürün" Binding="{Binding Product.Name}" IsReadOnly="True" Width="*" />
+                        <DataGridTextColumn Header="Barkod" Binding="{Binding Product.Barcode}" IsReadOnly="True" Width="130" />
+                        <DataGridTextColumn Header="Stok" Binding="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}" Width="90" />
+                        <DataGridTemplateColumn Width="100"><DataGridTemplateColumn.CellTemplate><DataTemplate><Button Content="Kaydet" Padding="8,2" Command="{Binding DataContext.SaveCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" /></DataTemplate></DataGridTemplateColumn.CellTemplate></DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
+        </ScrollViewer>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:CategoriesViewModel}">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="28">
+                <TextBlock Text="{Binding Title}" Style="{StaticResource H1}" />
+                <TextBlock Text="{Binding Error}" Style="{StaticResource ErrorText}" Visibility="{Binding Error, Converter={StaticResource NullVis}}" />
+                <TextBlock Text="{Binding Info}" Style="{StaticResource InfoText}" Visibility="{Binding Info, Converter={StaticResource NullVis}}" />
+                <ProgressBar IsIndeterminate="True" Height="3" Visibility="{Binding IsBusy, Converter={StaticResource BoolVis}}" Margin="0,0,0,8" />
+                <TextBlock Text="Kategoriler Kapında tarafından yönetilir. Online satışa kapalı kategorilere ürün eklenemez." Style="{StaticResource Muted}" Margin="0,0,0,8" />
+                <DataGrid ItemsSource="{Binding Items}" MinHeight="400">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Kategori" Binding="{Binding Category.Name}" Width="*" />
+                        <DataGridTextColumn Header="Ürün sayım" Binding="{Binding ProductCount}" Width="110" />
+                        <DataGridCheckBoxColumn Header="18+" Binding="{Binding Category.IsAgeRestricted}" Width="60" />
+                        <DataGridCheckBoxColumn Header="Online satış" Binding="{Binding Category.IsOnlineSaleAllowed}" Width="100" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
+        </ScrollViewer>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:AddressBookViewModel}">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="28">
+                <TextBlock Text="{Binding Title}" Style="{StaticResource H1}" />
+                <TextBlock Text="{Binding Error}" Style="{StaticResource ErrorText}" Visibility="{Binding Error, Converter={StaticResource NullVis}}" />
+                <TextBlock Text="{Binding Info}" Style="{StaticResource InfoText}" Visibility="{Binding Info, Converter={StaticResource NullVis}}" />
+                <ProgressBar IsIndeterminate="True" Height="3" Visibility="{Binding IsBusy, Converter={StaticResource BoolVis}}" Margin="0,0,0,8" />
+                <TextBlock Text="Müşteri telefonunu herhangi bir biçimde girin (0532…, +90532…, 532…)." Margin="0,0,0,8" />
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                    <TextBox Width="260" Text="{Binding Phone, UpdateSourceTrigger=PropertyChanged}" />
+                    <Button Content="Ara" Command="{Binding LookupCommand}" IsDefault="True" Margin="8,0,0,0" />
+                </StackPanel>
+                <ItemsControl ItemsSource="{Binding Results}">
+                    <ItemsControl.ItemTemplate><DataTemplate><Border Style="{StaticResource Card}"><StackPanel>
+                        <TextBlock Text="{Binding CustomerName}" FontWeight="Bold" />
+                        <TextBlock Text="{Binding AddressLine}" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding Directions}" Style="{StaticResource Muted}" TextWrapping="Wrap" />
+                        <TextBlock Style="{StaticResource Muted}"><Run Text="Kullanım: " /><Run Text="{Binding UseCount, Mode=OneWay}" /><Run Text=" · Son: " /><Run Text="{Binding LastUsedAt, StringFormat=g, Mode=OneWay}" /></TextBlock>
+                    </StackPanel></Border></DataTemplate></ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:SalesViewModel}">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="28">
+                <TextBlock Text="{Binding Title}" Style="{StaticResource H1}" />
+                <TextBlock Text="{Binding Error}" Style="{StaticResource ErrorText}" Visibility="{Binding Error, Converter={StaticResource NullVis}}" />
+                <TextBlock Text="{Binding Info}" Style="{StaticResource InfoText}" Visibility="{Binding Info, Converter={StaticResource NullVis}}" />
+                <ProgressBar IsIndeterminate="True" Height="3" Visibility="{Binding IsBusy, Converter={StaticResource BoolVis}}" Margin="0,0,0,8" />
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                    <ComboBox ItemsSource="{Binding Ranges}" SelectedItem="{Binding Range}" Width="160" />
+                    <Button Content="CSV dışa aktar" Style="{StaticResource SecondaryButton}" Command="{Binding ExportCsvCommand}" Margin="8,0,0,0" />
+                </StackPanel>
+                <UniformGrid Columns="4" Margin="0,0,0,12">
+                    <Border Style="{StaticResource Card}" Margin="0,0,8,0"><StackPanel><TextBlock Text="Teslim edilen" Style="{StaticResource Muted}" /><TextBlock Text="{Binding Summary.DeliveredOrders}" FontSize="24" FontWeight="Bold" /></StackPanel></Border>
+                    <Border Style="{StaticResource Card}" Margin="0,0,8,0"><StackPanel><TextBlock Text="İptal / ret" Style="{StaticResource Muted}" /><TextBlock Text="{Binding Summary.CancelledOrders}" FontSize="24" FontWeight="Bold" /></StackPanel></Border>
+                    <Border Style="{StaticResource Card}" Margin="0,0,8,0"><StackPanel><TextBlock Text="Ürün satışı" Style="{StaticResource Muted}" /><TextBlock Text="{Binding Summary.ProductGmv, Converter={StaticResource Try}}" FontSize="20" FontWeight="Bold" /></StackPanel></Border>
+                    <Border Style="{StaticResource Card}"><StackPanel><TextBlock Text="Komisyon" Style="{StaticResource Muted}" /><TextBlock Text="{Binding Summary.CommissionTotal, Converter={StaticResource Try}}" FontSize="20" FontWeight="Bold" /></StackPanel></Border>
+                </UniformGrid>
+                <DataGrid ItemsSource="{Binding Commissions}" MinHeight="300">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Teslim" Binding="{Binding DeliveredAt, StringFormat=g}" Width="150" />
+                        <DataGridTextColumn Header="Uygun kalem" Binding="{Binding EligibleItemCount}" Width="110" />
+                        <DataGridTextColumn Header="Birim" Binding="{Binding UnitAmount, Converter={StaticResource Try}}" Width="100" />
+                        <DataGridTextColumn Header="Komisyon" Binding="{Binding TotalAmount, Converter={StaticResource Try}}" Width="110" />
+                        <DataGridTextColumn Header="Ürün satışı" Binding="{Binding ProductGmv, Converter={StaticResource Try}}" Width="*" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
+        </ScrollViewer>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:SettlementViewModel}">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="28">
+                <TextBlock Text="{Binding Title}" Style="{StaticResource H1}" />
+                <TextBlock Text="{Binding Error}" Style="{StaticResource ErrorText}" Visibility="{Binding Error, Converter={StaticResource NullVis}}" />
+                <TextBlock Text="{Binding Info}" Style="{StaticResource InfoText}" Visibility="{Binding Info, Converter={StaticResource NullVis}}" />
+                <ProgressBar IsIndeterminate="True" Height="3" Visibility="{Binding IsBusy, Converter={StaticResource BoolVis}}" Margin="0,0,0,8" />
+                <TextBlock Text="Mutabakat dönemsel olarak Kapında tarafından oluşturulur. Ödenecek tutar: komisyon + düzeltmeler." Style="{StaticResource Muted}" Margin="0,0,0,8" />
+                <DataGrid ItemsSource="{Binding Items}" MinHeight="300">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Başlangıç" Binding="{Binding PeriodStart}" Width="110" />
+                        <DataGridTextColumn Header="Bitiş" Binding="{Binding PeriodEnd}" Width="110" />
+                        <DataGridTextColumn Header="Sipariş" Binding="{Binding OrderCount}" Width="80" />
+                        <DataGridTextColumn Header="Ürün satışı" Binding="{Binding ProductGmv, Converter={StaticResource Try}}" Width="130" />
+                        <DataGridTextColumn Header="Komisyon" Binding="{Binding CommissionTotal, Converter={StaticResource Try}}" Width="120" />
+                        <DataGridTextColumn Header="Düzeltme" Binding="{Binding AdjustmentTotal, Converter={StaticResource Try}}" Width="110" />
+                        <DataGridTextColumn Header="Ödenecek" Binding="{Binding PayableAmount, Converter={StaticResource Try}}" Width="120" />
+                        <DataGridTextColumn Header="Durum" Binding="{Binding Status, Converter={StaticResource StatusLabel}, ConverterParameter=settlement}" Width="*" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
+        </ScrollViewer>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:HoursViewModel}">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="28">
+                <TextBlock Text="{Binding Title}" Style="{StaticResource H1}" />
+                <TextBlock Text="{Binding Error}" Style="{StaticResource ErrorText}" Visibility="{Binding Error, Converter={StaticResource NullVis}}" />
+                <TextBlock Text="{Binding Info}" Style="{StaticResource InfoText}" Visibility="{Binding Info, Converter={StaticResource NullVis}}" />
+                <ProgressBar IsIndeterminate="True" Height="3" Visibility="{Binding IsBusy, Converter={StaticResource BoolVis}}" Margin="0,0,0,8" />
+                <TextBlock Text="Saat biçimi SS:DD. Hizmet bölgesi saatleri (09:00–23:00) dışında sipariş alınmaz." Style="{StaticResource Muted}" Margin="0,0,0,8" />
+                <ItemsControl ItemsSource="{Binding Days}">
+                    <ItemsControl.ItemTemplate><DataTemplate>
+                        <StackPanel Orientation="Horizontal" Margin="0,4">
+                            <TextBlock Text="{Binding DayName}" Width="110" VerticalAlignment="Center" />
+                            <TextBox Text="{Binding OpensAt}" Width="70" Margin="0,0,8,0" />
+                            <TextBox Text="{Binding ClosesAt}" Width="70" Margin="0,0,12,0" />
+                            <CheckBox Content="Kapalı" IsChecked="{Binding IsClosed}" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </DataTemplate></ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <Button Content="Kaydet" Command="{Binding SaveCommand}" HorizontalAlignment="Left" Margin="0,12,0,0" />
+            </StackPanel>
+        </ScrollViewer>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:StoreViewModel}">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="28">
+                <TextBlock Text="{Binding Title}" Style="{StaticResource H1}" />
+                <TextBlock Text="{Binding Error}" Style="{StaticResource ErrorText}" Visibility="{Binding Error, Converter={StaticResource NullVis}}" />
+                <TextBlock Text="{Binding Info}" Style="{StaticResource InfoText}" Visibility="{Binding Info, Converter={StaticResource NullVis}}" />
+                <ProgressBar IsIndeterminate="True" Height="3" Visibility="{Binding IsBusy, Converter={StaticResource BoolVis}}" Margin="0,0,0,8" />
+                <Border Style="{StaticResource Card}" MaxWidth="640" HorizontalAlignment="Left">
+                    <StackPanel>
+                        <TextBlock Text="{Binding Vendor.Name}" Style="{StaticResource H2}" />
+                        <TextBlock Text="{Binding Vendor.AddressText}" Style="{StaticResource Muted}" Margin="0,0,0,10" />
+                        <Image Source="{Binding LogoUrl}" Height="90" HorizontalAlignment="Left" Visibility="{Binding LogoUrl, Converter={StaticResource NullVis}}" />
+                        <Button Content="Logo yükle" Style="{StaticResource SecondaryButton}" Command="{Binding UploadLogoCommand}" HorizontalAlignment="Left" Margin="0,6,0,12" />
+                        <TextBlock Text="Açıklama" /><TextBox Text="{Binding Description}" Height="70" TextWrapping="Wrap" AcceptsReturn="True" Margin="0,4,0,10" />
+                        <TextBlock Text="Telefon" /><TextBox Text="{Binding Phone}" Margin="0,4,0,10" />
+                        <TextBlock Text="E-posta" /><TextBox Text="{Binding Email}" Margin="0,4,0,10" />
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="Kaydet" Command="{Binding SaveCommand}" />
+                            <Button Content="Siparişe aç / kapat" Style="{StaticResource AccentButton}" Command="{Binding ToggleOpenCommand}" />
+                        </StackPanel>
+                        <TextBlock Text="Adres ve konum değişiklikleri için destek@kapinda.site ile iletişime geçin." Style="{StaticResource Muted}" Margin="0,10,0,0" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:NotificationsViewModel}">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="28">
+                <TextBlock Text="{Binding Title}" Style="{StaticResource H1}" />
+                <TextBlock Text="{Binding Error}" Style="{StaticResource ErrorText}" Visibility="{Binding Error, Converter={StaticResource NullVis}}" />
+                <TextBlock Text="{Binding Info}" Style="{StaticResource InfoText}" Visibility="{Binding Info, Converter={StaticResource NullVis}}" />
+                <ProgressBar IsIndeterminate="True" Height="3" Visibility="{Binding IsBusy, Converter={StaticResource BoolVis}}" Margin="0,0,0,8" />
+                <Button Content="Tümünü okundu say" Style="{StaticResource SecondaryButton}" Command="{Binding MarkAllReadCommand}" HorizontalAlignment="Left" Margin="0,0,0,12" />
+                <ItemsControl ItemsSource="{Binding Items}">
+                    <ItemsControl.ItemTemplate><DataTemplate><Border Style="{StaticResource Card}"><StackPanel>
+                        <TextBlock Text="{Binding Title}" FontWeight="Bold" />
+                        <TextBlock Text="{Binding Body}" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding CreatedAt, StringFormat=g}" Style="{StaticResource Muted}" />
+                    </StackPanel></Border></DataTemplate></ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:ProfileViewModel}">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="28">
+                <TextBlock Text="{Binding Title}" Style="{StaticResource H1}" />
+                <TextBlock Text="{Binding Error}" Style="{StaticResource ErrorText}" Visibility="{Binding Error, Converter={StaticResource NullVis}}" />
+                <TextBlock Text="{Binding Info}" Style="{StaticResource InfoText}" Visibility="{Binding Info, Converter={StaticResource NullVis}}" />
+                <ProgressBar IsIndeterminate="True" Height="3" Visibility="{Binding IsBusy, Converter={StaticResource BoolVis}}" Margin="0,0,0,8" />
+                <Border Style="{StaticResource Card}" MaxWidth="640" HorizontalAlignment="Left">
+                    <StackPanel>
+                        <TextBlock Text="{Binding VendorName}" Style="{StaticResource H2}" />
+                        <TextBlock Text="{Binding Email}" Margin="0,4" />
+                        <TextBlock><Run Text="Müşteri puanı: " /><Run Text="{Binding Rating, Mode=OneWay}" /></TextBlock>
+                        <TextBlock Text="{Binding Commission}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                        <TextBlock Text="Destek: destek@kapinda.site · +90 531 870 1189" Style="{StaticResource Muted}" Margin="0,8,0,0" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="28">
+                <TextBlock Text="{Binding Title}" Style="{StaticResource H1}" />
+                <TextBlock Text="{Binding Error}" Style="{StaticResource ErrorText}" Visibility="{Binding Error, Converter={StaticResource NullVis}}" />
+                <TextBlock Text="{Binding Info}" Style="{StaticResource InfoText}" Visibility="{Binding Info, Converter={StaticResource NullVis}}" />
+                <ProgressBar IsIndeterminate="True" Height="3" Visibility="{Binding IsBusy, Converter={StaticResource BoolVis}}" Margin="0,0,0,8" />
+                <Border Style="{StaticResource Card}" MaxWidth="640" HorizontalAlignment="Left">
+                    <StackPanel>
+                        <CheckBox Content="Yeni siparişte sesli uyarı" IsChecked="{Binding SoundAlerts}" Margin="0,0,0,8" />
+                        <CheckBox Content="Yeni siparişte görev çubuğunu yakıp söndür" IsChecked="{Binding FlashWindow}" Margin="0,0,0,12" />
+                        <TextBlock Text="{Binding Version, StringFormat=Sürüm {0}}" Style="{StaticResource Muted}" />
+                        <Button Content="Çıkış yap" Style="{StaticResource DangerButton}" Command="{Binding SignOutCommand}" HorizontalAlignment="Left" Margin="0,12,0,0" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </DataTemplate>
+</ResourceDictionary>
