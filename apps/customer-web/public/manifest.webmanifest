@@ -1,0 +1,19 @@
+{
+  "name": "Kapında — Hopa'da ihtiyacın olanlar kapında",
+  "short_name": "Kapında",
+  "description": "Hopa'daki yerel market ve esnaflardan sipariş ver, Kapında sana getirsin.",
+  "lang": "tr",
+  "dir": "ltr",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f6f4ef",
+  "theme_color": "#0f6b4f",
+  "categories": ["food", "shopping"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

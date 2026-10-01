@@ -1,0 +1,44 @@
+<Window x:Class="Kapinda.Vendor.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Kapında İşletme" Width="1280" Height="820" MinWidth="980" MinHeight="640"
+        WindowStartupLocation="CenterScreen" Background="{StaticResource CreamBrush}" Icon="Assets/kapinda.ico">
+    <DockPanel>
+        <!-- Yeni sipariş bandı -->
+        <Border DockPanel.Dock="Top" Background="{StaticResource SaffronBrush}" Padding="16,10" Visibility="{Binding Banner, Converter={StaticResource NullVis}}">
+            <DockPanel>
+                <Button DockPanel.Dock="Right" Content="Siparişi aç" Command="{Binding OpenNewOrdersCommand}" />
+                <TextBlock Text="{Binding Banner}" FontWeight="Bold" FontSize="16" VerticalAlignment="Center" Foreground="#3A2400" />
+            </DockPanel>
+        </Border>
+        <!-- Sol menü -->
+        <Border DockPanel.Dock="Left" Width="230" Background="White" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,1,0"
+                Visibility="{Binding IsSignedIn, Converter={StaticResource BoolVis}}">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Top" Margin="16,18,16,12">
+                    <TextBlock Text="Kapında İşletme" FontSize="18" FontWeight="Bold" Foreground="{StaticResource GreenBrush}" />
+                    <TextBlock Text="{Binding State.Vendor.Name}" Style="{StaticResource Muted}" TextTrimming="CharacterEllipsis" />
+                    <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                        <Ellipse Width="8" Height="8" Fill="{StaticResource GreenBrush}" Visibility="{Binding RealtimeConnected, Converter={StaticResource BoolVis}}" />
+                        <Ellipse Width="8" Height="8" Fill="{StaticResource DangerBrush}" Visibility="{Binding RealtimeConnected, Converter={StaticResource InvBoolVis}}" />
+                        <TextBlock Text=" Canlı bağlantı" Style="{StaticResource Muted}" />
+                    </StackPanel>
+                    <TextBlock Margin="0,6,0,0" Foreground="{StaticResource DangerBrush}" FontWeight="Bold"
+                               Text="{Binding NewOrderCount, StringFormat={}{0} sipariş onay bekliyor}" />
+                </StackPanel>
+                <ListBox ItemsSource="{Binding Nav}" SelectedItem="{Binding SelectedNav}" BorderThickness="0" Background="Transparent"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Margin="8,6">
+                                <TextBlock Text="{Binding Glyph}" FontFamily="Segoe MDL2 Assets" Width="26" VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding Label}" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+        </Border>
+        <ContentControl Content="{Binding Current}" />
+    </DockPanel>
+</Window>

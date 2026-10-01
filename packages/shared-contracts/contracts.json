@@ -1,0 +1,230 @@
+{
+  "$comment": "Kapında ortak contract kaynağı. TypeScript, Kotlin ve C# dosyaları scripts/generate-contracts.mjs ile buradan üretilir. SQL enum'ları supabase/migrations içinde aynı değerlerle tanımlıdır ve supabase/tests/00_contracts.sql bu dosyayla eşleşmeyi doğrular.",
+  "version": 1,
+  "enums": {
+    "AppRole": {
+      "sql": "app_role",
+      "values": {
+        "admin": "Yönetici",
+        "courier": "Kurye",
+        "vendor": "İşletme",
+        "customer": "Müşteri"
+      }
+    },
+    "OrderStatus": {
+      "sql": "order_status",
+      "values": {
+        "pending_payment": "Ödeme bekleniyor",
+        "payment_confirmed": "Ödeme onaylandı",
+        "vendor_pending": "İşletme onayı bekleniyor",
+        "vendor_accepted": "İşletme kabul etti",
+        "preparing": "Hazırlanıyor",
+        "ready_for_pickup": "Teslim almaya hazır",
+        "courier_assigned": "Kurye atandı",
+        "picked_up": "Kurye teslim aldı",
+        "on_the_way": "Yolda",
+        "delivered": "Teslim edildi",
+        "cancelled": "İptal edildi",
+        "rejected": "İşletme reddetti",
+        "failed": "Başarısız"
+      }
+    },
+    "TransitionActor": {
+      "sql": "transition_actor",
+      "values": {
+        "system": "Sistem",
+        "customer": "Müşteri",
+        "vendor": "İşletme",
+        "courier": "Kurye",
+        "admin": "Yönetici",
+        "qr_verification": "QR doğrulama"
+      }
+    },
+    "PaymentStatus": {
+      "sql": "payment_status",
+      "values": {
+        "initiated": "Başlatıldı",
+        "pending": "Bekliyor",
+        "succeeded": "Başarılı",
+        "failed": "Başarısız",
+        "refund_pending": "İade bekliyor",
+        "refunded": "İade edildi"
+      }
+    },
+    "OrderPaymentState": {
+      "sql": "order_payment_state",
+      "values": {
+        "pending": "Bekliyor",
+        "paid": "Ödendi",
+        "failed": "Başarısız",
+        "not_required": "Gerekli değil",
+        "refund_pending": "İade bekliyor",
+        "refunded": "İade edildi"
+      }
+    },
+    "ProductPaymentMethod": {
+      "sql": "product_payment_method",
+      "values": {
+        "cash": "Kapıda nakit",
+        "card_on_delivery": "Kapıda kredi kartı / POS"
+      }
+    },
+    "SubstitutionPreference": {
+      "sql": "substitution_preference",
+      "values": {
+        "find_alternative": "Alternatif ara",
+        "notify_and_cancel": "Bana bildir ve iptal et",
+        "remove": "Doğrudan çıkar"
+      }
+    },
+    "ItemFulfillment": {
+      "sql": "item_fulfillment",
+      "values": {
+        "pending": "Bekliyor",
+        "fulfilled": "Hazırlandı",
+        "substituted": "Alternatif ile değiştirildi",
+        "removed": "Çıkarıldı"
+      }
+    },
+    "IncidentType": {
+      "sql": "incident_type",
+      "values": {
+        "accident": "Kaza yaptım",
+        "vehicle_breakdown": "Aracım arızalandı",
+        "out_of_fuel": "Yakıtım bitti",
+        "health_issue": "Sağlık sorunum var",
+        "security_issue": "Güvenlik sorunu",
+        "road_blocked": "Yol kapalı / trafik",
+        "other": "Diğer"
+      }
+    },
+    "CourierAvailability": {
+      "sql": "courier_availability",
+      "values": {
+        "offline": "Çevrimdışı",
+        "available": "Müsait",
+        "busy": "Meşgul",
+        "unavailable": "Kullanılamaz"
+      }
+    },
+    "ApprovalStatus": {
+      "sql": "approval_status",
+      "values": {
+        "pending": "Onay bekliyor",
+        "active": "Aktif",
+        "suspended": "Askıya alındı",
+        "rejected": "Reddedildi"
+      }
+    },
+    "ApplicationStatus": {
+      "sql": "application_status",
+      "values": {
+        "pending": "İnceleniyor",
+        "approved": "Onaylandı",
+        "rejected": "Reddedildi"
+      }
+    },
+    "SupportStatus": {
+      "sql": "support_status",
+      "values": {
+        "open": "Açık",
+        "waiting": "Yanıt bekleniyor",
+        "resolved": "Çözüldü"
+      }
+    },
+    "SettlementStatus": {
+      "sql": "settlement_status",
+      "values": {
+        "draft": "Taslak",
+        "approved": "Onaylandı",
+        "paid": "Ödendi",
+        "cancelled": "İptal"
+      }
+    },
+    "DeviceApp": {
+      "sql": "device_app",
+      "values": {
+        "customer": "Müşteri",
+        "courier": "Kurye",
+        "vendor": "İşletme",
+        "admin": "Yönetici"
+      }
+    },
+    "DevicePlatform": {
+      "sql": "device_platform",
+      "values": {
+        "web": "Web",
+        "android": "Android",
+        "windows": "Windows"
+      }
+    },
+    "SeoErrorCode": {
+      "sql": "seo_error_code",
+      "values": {
+        "SITEMAP_FETCH_FAILED": "Sitemap alınamadı",
+        "INVALID_XML": "Geçersiz XML",
+        "HTTP_ERROR": "HTTP hatası",
+        "CANONICAL_MISMATCH": "Canonical uyuşmazlığı",
+        "ROBOTS_BLOCKED": "robots.txt tarafından engellendi",
+        "NOINDEX_DETECTED": "noindex tespit edildi",
+        "DUPLICATE_URL": "Tekrarlanan URL",
+        "MISSING_METADATA": "Eksik metadata"
+      }
+    },
+    "HealthStatus": {
+      "sql": "health_status",
+      "values": {
+        "operational": "Çalışıyor",
+        "degraded": "Kısmi sorun",
+        "unavailable": "Erişilemiyor"
+      }
+    }
+  },
+  "orderTransitions": [
+    ["pending_payment", "payment_confirmed", "system"],
+    ["pending_payment", "failed", "system"],
+    ["pending_payment", "cancelled", "customer"],
+    ["pending_payment", "cancelled", "system"],
+    ["payment_confirmed", "vendor_pending", "system"],
+    ["vendor_pending", "vendor_accepted", "vendor"],
+    ["vendor_pending", "rejected", "vendor"],
+    ["vendor_pending", "cancelled", "customer"],
+    ["vendor_pending", "cancelled", "admin"],
+    ["vendor_pending", "cancelled", "system"],
+    ["vendor_accepted", "preparing", "vendor"],
+    ["vendor_accepted", "cancelled", "vendor"],
+    ["vendor_accepted", "cancelled", "admin"],
+    ["preparing", "ready_for_pickup", "vendor"],
+    ["preparing", "cancelled", "vendor"],
+    ["preparing", "cancelled", "admin"],
+    ["ready_for_pickup", "courier_assigned", "courier"],
+    ["ready_for_pickup", "courier_assigned", "admin"],
+    ["ready_for_pickup", "courier_assigned", "system"],
+    ["ready_for_pickup", "cancelled", "admin"],
+    ["courier_assigned", "picked_up", "courier"],
+    ["courier_assigned", "ready_for_pickup", "courier"],
+    ["courier_assigned", "ready_for_pickup", "admin"],
+    ["courier_assigned", "ready_for_pickup", "system"],
+    ["courier_assigned", "cancelled", "admin"],
+    ["picked_up", "on_the_way", "courier"],
+    ["picked_up", "failed", "admin"],
+    ["on_the_way", "delivered", "qr_verification"],
+    ["on_the_way", "failed", "admin"]
+  ],
+  "rules": {
+    "minimumBasketTry": 250,
+    "commissionPerItemTry": 20,
+    "loyaltyOrderMilestone": 5,
+    "loyaltyReferralMilestone": 5,
+    "maxRatingCommentLength": 500,
+    "deliveryPricingDefault": {
+      "baseFeeTry": 120,
+      "baseDistanceKm": 2,
+      "perKmFeeTry": 10,
+      "maxDistanceKm": 15
+    },
+    "seriousIncidentTypes": ["accident", "vehicle_breakdown", "out_of_fuel", "health_issue", "security_issue"],
+    "terminalOrderStatuses": ["delivered", "cancelled", "rejected", "failed"],
+    "activeCourierStatuses": ["courier_assigned", "picked_up", "on_the_way"]
+  }
+}
