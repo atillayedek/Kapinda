@@ -1,0 +1,40 @@
+# Kapında — https://kapinda.site
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /sepet
+Disallow: /checkout
+Disallow: /profil
+Disallow: /siparislerim
+Disallow: /siparis-takip
+Disallow: /destek
+Disallow: /giris
+Disallow: /kayit
+Disallow: /sifremi-unuttum
+Disallow: /sifre-yenile
+Disallow: /auth/
+Disallow: /*?*
+
+# Yapay zekâ eğitim tarayıcıları (proje politikası)
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+Sitemap: https://kapinda.site/sitemap.xml
