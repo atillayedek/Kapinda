@@ -72,6 +72,7 @@ public static class ErrorMessages
         ["KPD_PRODUCT_UNAVAILABLE"] = "Seçilen ürün satışta değil.",
         ["KPD_PRODUCT_NOT_SELLABLE_ONLINE"] = "Bu ürün mevzuat gereği online siparişe kapalıdır.",
         ["KPD_OUT_OF_STOCK"] = "Seçilen ürünün stoğu yetersiz.",
+        ["KPD_SUBSTITUTE_TOO_EXPENSIVE"] = "Alternatif ürün tutarı orijinal ürünün %25 fazlasını aşamaz.",
         ["KPD_INVALID_QUANTITY"] = "Geçersiz adet.",
         ["KPD_INVALID_STORAGE_PATH"] = "Dosya yolu geçersiz.",
         ["KPD_IMMUTABLE_RECORD"] = "Bu kayıt değiştirilemez.",

@@ -541,6 +541,10 @@ begin
     if sp.track_stock and sp.stock_quantity < v_qty then
       raise exception 'KPD_OUT_OF_STOCK' using errcode = 'P0001';
     end if;
+    -- Müşteri koruması: alternatif kalem tutarı orijinal kalemin %25 fazlasını aşamaz
+    if sp.price * v_qty > it.line_total * 1.25 then
+      raise exception 'KPD_SUBSTITUTE_TOO_EXPENSIVE' using errcode = 'P0001';
+    end if;
     -- Orijinal ürünün ayrılmış stoğu iade edilir (fiziksel olarak yok sayılır: stok 0'a çekilir)
     update public.products set stock_quantity = 0 where id = it.product_id and track_stock;
     update public.products set stock_quantity = stock_quantity - v_qty where id = sp.id and track_stock;

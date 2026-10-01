@@ -25,7 +25,7 @@ create table public.payments (
   updated_at timestamptz not null default now()
 );
 create index payments_order_idx on public.payments (order_id, created_at desc);
-create unique index payments_one_succeeded_per_order on public.payments (order_id) where status in ('succeeded', 'refund_pending', 'refunded');
+create unique index payments_one_succeeded_per_order on public.payments (order_id) where status = 'succeeded';
 create trigger payments_updated_at before update on public.payments for each row execute function public.set_updated_at();
 
 -- Webhook/callback olayları (idempotency)

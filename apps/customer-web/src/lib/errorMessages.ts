@@ -64,6 +64,7 @@ const MESSAGES: Record<string, string> = {
   KPD_INVALID_STORAGE_PATH: "Dosya yolu geçersiz.",
   KPD_ITEM_UPDATE_NOT_ALLOWED: "Bu ürün bu aşamada güncellenemez.",
   KPD_NOT_CONFIGURED: "Bu özellik henüz yapılandırılmadı.",
+  KPD_SUBSTITUTE_TOO_EXPENSIVE: "Alternatif ürün tutarı orijinal ürünün %25 fazlasını aşamaz.",
 };
 
 export function errorMessage(err: unknown): string {

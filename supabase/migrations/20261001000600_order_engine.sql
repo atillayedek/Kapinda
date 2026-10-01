@@ -884,6 +884,16 @@ begin
     return jsonb_build_object('result', 'amount_mismatch', 'order_id', o.id);
   end if;
 
+  -- Aynı sipariş için ikinci başarılı tahsilat (ör. iki sekmede ödeme): mükerrer tutar otomatik iade kuyruğuna alınır
+  if exists (select 1 from public.payments where order_id = pay.order_id and id <> pay.id and status = 'succeeded') then
+    update public.payments set status = 'refund_pending', provider_payment_id = p_provider_payment_id, paid_at = now(),
+      refund_requested_at = now(), failure_reason = 'duplicate_payment', provider_response = p_provider_response
+    where id = pay.id;
+    perform public._notify_admins('payment_issue', 'Mükerrer ödeme',
+      format('%s siparişi için ikinci ödeme alındı; iade kuyruğuna eklendi.', o.order_number), jsonb_build_object('order_id', o.id));
+    return jsonb_build_object('result', 'duplicate_refund_queued', 'order_id', o.id);
+  end if;
+
   update public.payments set status = 'succeeded', provider_payment_id = p_provider_payment_id, paid_at = now(),
     provider_response = p_provider_response
   where id = pay.id;

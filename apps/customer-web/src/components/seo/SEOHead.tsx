@@ -32,9 +32,14 @@ export function SEOHead({ title, description, path, noindex = false, image, json
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={img} />
-      {jsonLd && <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>}
+      {jsonLd && <script type="application/ld+json">{safeJsonLd(jsonLd)}</script>}
     </Helmet>
   );
+}
+
+/** JSON-LD içinde </script> kapanışını ve HTML ayrıştırma hilelerini önler. */
+export function safeJsonLd(data: unknown): string {
+  return JSON.stringify(data).replace(/</g, "\\u003c").replace(/>/g, "\\u003e").replace(/&/g, "\\u0026");
 }
 
 export function PrivatePage({ title }: { title: string }) {
