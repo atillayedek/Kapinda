@@ -10,7 +10,8 @@ export PGHOST="${PGHOST:-localhost}" PGPORT="${PGPORT:-5432}" PGUSER="${PGUSER:-
 cleanup() { dropdb --if-exists "$DB" >/dev/null 2>&1 || true; }
 trap cleanup EXIT
 
-createdb "$DB"
+# CI (postgres:16 imajı) en_US.utf8 harmanlamasıyla çalışır; yerelde aynısı için: KAPINDA_CREATEDB_OPTS="--template=template0 --locale-provider=icu --icu-locale=en-US-u-ka-shifted --locale=C"
+createdb ${KAPINDA_CREATEDB_OPTS:-} "$DB"
 export KAPINDA_ROOT="$ROOT"
 PSQL=(psql -X -q -v ON_ERROR_STOP=1 -d "$DB")
 "${PSQL[@]}" -f "$ROOT/supabase/tests/shim/supabase_shim.sql"

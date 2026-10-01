@@ -13,10 +13,10 @@ declare
   v_json text[];
 begin
   for r in select key, value from jsonb_each((select j from c) -> 'enums') loop
-    select array_agg(e.enumlabel::text order by e.enumlabel::text) into v_db
+    select array_agg(e.enumlabel::text order by e.enumlabel::text collate "C") into v_db
     from pg_enum e join pg_type t on t.oid = e.enumtypid
     where t.typname = r.value ->> 'sql' and t.typnamespace = 'public'::regnamespace;
-    select array_agg(k order by k) into v_json from jsonb_object_keys(r.value -> 'values') as x(k);
+    select array_agg(k order by k collate "C") into v_json from jsonb_object_keys(r.value -> 'values') as x(k);
     perform tests.assert_eq(v_db, v_json, format('enum %s eşleşiyor', r.key));
   end loop;
 end $$;

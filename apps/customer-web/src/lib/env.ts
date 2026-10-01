@@ -1,17 +1,20 @@
 // Yalnız herkese açık (VITE_) değişkenler. service_role anahtarı istemciye ASLA verilmez.
+// Tanımsız GitHub secret'ı boş dize olarak gelir; boş değer "tanımsız" sayılır.
+const read = (value: unknown): string | undefined => (typeof value === "string" && value.trim() !== "" ? value.trim() : undefined);
+
 export const env = {
-  supabaseUrl: import.meta.env.VITE_SUPABASE_URL as string | undefined,
-  supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined,
-  siteUrl: ((import.meta.env.VITE_SITE_URL as string | undefined) ?? "https://kapinda.site").replace(/\/$/, ""),
-  mapsKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string | undefined,
+  supabaseUrl: read(import.meta.env.VITE_SUPABASE_URL),
+  supabaseAnonKey: read(import.meta.env.VITE_SUPABASE_ANON_KEY),
+  siteUrl: (read(import.meta.env.VITE_SITE_URL) ?? "https://kapinda.site").replace(/\/$/, ""),
+  mapsKey: read(import.meta.env.VITE_GOOGLE_MAPS_API_KEY),
   firebase: {
-    apiKey: import.meta.env.VITE_FIREBASE_API_KEY as string | undefined,
-    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN as string | undefined,
-    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID as string | undefined,
-    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID as string | undefined,
-    appId: import.meta.env.VITE_FIREBASE_APP_ID as string | undefined,
+    apiKey: read(import.meta.env.VITE_FIREBASE_API_KEY),
+    authDomain: read(import.meta.env.VITE_FIREBASE_AUTH_DOMAIN),
+    projectId: read(import.meta.env.VITE_FIREBASE_PROJECT_ID),
+    messagingSenderId: read(import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID),
+    appId: read(import.meta.env.VITE_FIREBASE_APP_ID),
   },
-  vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY as string | undefined,
+  vapidKey: read(import.meta.env.VITE_FIREBASE_VAPID_KEY),
 };
 
 export const isConfigured = Boolean(env.supabaseUrl && env.supabaseAnonKey);
