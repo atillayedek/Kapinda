@@ -20,7 +20,9 @@ revoke all on all sequences in schema public from anon, authenticated;
 
 -- Fonksiyonlar: varsayılan olarak kimse çalıştıramaz; aşağıda açıkça izin verilir.
 revoke execute on all functions in schema public from public, anon, authenticated;
-alter default privileges in schema public revoke execute on functions from public, anon, authenticated;
+-- PUBLIC'in EXECUTE varsayılanı küresel bir varsayılandır; şema bazlı ALTER DEFAULT PRIVILEGES onu kaldıramaz.
+alter default privileges revoke execute on functions from public;
+alter default privileges in schema public revoke execute on functions from anon, authenticated;
 alter default privileges in schema public revoke all on tables from anon, authenticated;
 
 -- RLS politikalarında kullanılan yardımcılar

@@ -97,6 +97,7 @@ begin
 end;
 $$;
 
+revoke execute on function public.can_upload_delivery_proof(text), public.can_read_delivery_proof(text) from public, anon;
 grant execute on function public.can_upload_delivery_proof(text), public.can_read_delivery_proof(text) to authenticated;
 
 create policy "delivery proofs courier upload" on storage.objects for insert to authenticated

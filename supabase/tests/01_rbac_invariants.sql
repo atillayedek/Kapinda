@@ -118,6 +118,33 @@ begin
   perform tests.assert_raises($q$select public.consume_delivery_qr(gen_random_uuid(), gen_random_uuid(), repeat('a',64), gen_random_uuid(), 0, 0, '{}')$q$, '42501', 'QR tüketimi istemciden çağrılamaz');
   perform tests.assert_raises($q$select public.confirm_delivery_payment(gen_random_uuid(), 'x', 1, '{}')$q$, '42501', 'ödeme onayı istemciden çağrılamaz');
   perform tests.assert_raises($q$select public.create_delivery_fee_quote(gen_random_uuid(), gen_random_uuid(), gen_random_uuid(), 1, 'google_maps')$q$, '42501', 'teslimat ücreti teklifi istemciden oluşturulamaz');
+  perform tests.assert_raises($q$select public._order_transition(gen_random_uuid(), 'delivered', 'qr_verification')$q$, '42501', 'iç durum geçiş fonksiyonu istemciye kapalı');
+  perform tests.assert_raises($q$select public._audit('x', 'y', null, null, null, null)$q$, '42501', 'audit yazma fonksiyonu istemciye kapalı');
+  perform tests.assert_raises($q$select public._notify(auth.uid(), 'customer', 'x', 'y', 'z')$q$, '42501', 'bildirim üretme fonksiyonu istemciye kapalı');
+  perform tests.assert_raises($q$select public._invoke_edge_function('dispatch-notifications')$q$, '42501', 'edge çağrı fonksiyonu istemciye kapalı');
+  perform tests.assert_raises($q$select public.expire_pending_payments()$q$, '42501', 'zaman aşımı işi istemciye kapalı');
+  perform tests.assert_raises($q$select public.admin_set_product_active(gen_random_uuid(), false, 'ürünü pasifleştirme denemesi')$q$, 'KPD_FORBIDDEN', 'ürün moderasyonu yalnız admin');
   perform tests.reset_role();
+end $$;
+rollback;
+
+-- Fonksiyon ayrıcalık invariant'ı: anon yalnız izinli listeyi, authenticated hiçbir iç (_ önekli) fonksiyonu çalıştıramaz
+begin;
+do $$
+declare
+  v_anon text[];
+  v_internal text[];
+begin
+  select array_agg(distinct p.proname order by p.proname) into v_anon
+  from pg_proc p where p.pronamespace = 'public'::regnamespace and has_function_privilege('anon', p.oid, 'EXECUTE');
+  perform tests.assert_eq(v_anon, array['can_view_order', 'coverage_area_is_open', 'current_courier_id', 'has_role', 'is_admin',
+    'is_vendor_member', 'log_client_event', 'normalize_tr_phone', 'public_track_order', 'vendor_is_open_now'],
+    'anon yalnız izinli fonksiyonları çalıştırabilir');
+  select array_agg(p.proname order by p.proname) into v_internal
+  from pg_proc p where p.pronamespace = 'public'::regnamespace and p.proname like '\_%'
+    and has_function_privilege('authenticated', p.oid, 'EXECUTE');
+  perform tests.assert_eq(v_internal, null::text[], 'authenticated hiçbir iç (_) fonksiyonu çalıştıramaz');
+  perform tests.assert_true(not has_function_privilege('authenticated', 'public.consume_delivery_qr(uuid,uuid,text,uuid,double precision,double precision,jsonb)', 'EXECUTE'), 'QR tüketimi authenticated için kapalı');
+  perform tests.assert_true(not has_function_privilege('authenticated', 'public.bootstrap_first_admin(text)', 'EXECUTE'), 'bootstrap authenticated için kapalı');
 end $$;
 rollback;
