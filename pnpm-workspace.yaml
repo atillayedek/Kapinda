@@ -1,0 +1,3 @@
+packages:
+  - "apps/customer-web"
+  - "packages/*"
