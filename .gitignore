@@ -1,0 +1,49 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# builds
+dist/
+build/
+*.tsbuildinfo
+.vite/
+coverage/
+
+# env & secrets
+.env
+.env.*
+!.env.example
+*.keystore
+*.jks
+google-services.json
+GoogleService-Info.plist
+service-account*.json
+*.pem
+*.p12
+!**/test-fixtures/*.pem
+
+# Android
+.gradle/
+local.properties
+apps/courier-android/app/build/
+apps/courier-android/build/
+captures/
+.idea/
+*.iml
+
+# .NET
+bin/
+obj/
+*.user
+.vs/
+publish/
+
+# Supabase
+supabase/.branches/
+supabase/.temp/
+supabase/functions/.env
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log
